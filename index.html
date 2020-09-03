@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta charset="utf-8">
+    <title>Gravity</title>
+    <style>
+        body{
+            background-color: lightgreen;
+        }
+        canvas{
+            border:2px solid black;
+            background-color: #f1f1f1;
+        }
+
+        button{
+        	width: 232px;
+            height: 40px;
+            font-size: 24px;
+            background-image: linear-gradient(to right, #ff0000, #ffa500, #ffff00, #008000, #0000ff, #4b0082, #ee82ee);
+        }
+        #options{
+            position: absolute;
+            left: 720px;
+            top: 8px;
+            padding: 8px 8px 0px 8px;
+            display: inline-block;
+            border:2px solid black;
+            background-color: #c7c7c7;
+        }
+        label{
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+        input{
+            width: 110px;
+        }
+        #cor{
+            width: 112px;
+        }
+        select{
+            width: 118px;
+        }
+        #alert div{
+            background-color: #ff9a8f;
+            border: 1px solid #c97b73;
+            margin-bottom: 8px;
+            width: 112px;
+            padding: 2px;
+        }
+    </style>
+</head>
+
+<body onload="myGameArea.start(); insert();" onkeydown="board(event)" tabindex="0">
+    <script>
+        var myGamePiece, i, rand = "0123456789ABCDEF", pulos = 0, stop = 0, altura, cor, type, bounce, gravidade, velox, alert, quique = 0, change=0, forca, area;
+
+        function insert(){
+            document.getElementById("altura").value=30;
+            cor = "#";
+            for(i=0;i<6;i++){
+                cor += rand[Math.floor(Math.random() * 16)];
+            }
+            document.getElementById("cor").value=cor;
+            document.getElementById("bounce").value=70;
+            document.getElementById("gravidade").value=100;
+            document.getElementById("velox").value=10;
+            document.getElementById("forca").value=30;
+        }
+
+        function startGame(){
+            document.body.focus();
+            if (stop!=1){
+                alert = document.getElementById("alert");
+                alert.innerHTML="";
+                document.getElementById("start").innerHTML="Restart"
+
+                altura = document.getElementById("altura").value;
+                if (altura<1||altura>500){
+                    alert.innerHTML += "<div>Altura inválida. Limite: 1&le;x&le;500</div>";
+                    altura = 30;
+                }
+
+                cor = document.getElementById("cor").value;
+
+                bounce = document.getElementById("bounce").value;
+                if (bounce<0||bounce>1000||bounce==""){
+                    alert.innerHTML += "<div>Quique inválido. Limite: 0&le;x&le;1000</div>";
+                    bounce = 0.7;
+                }
+                else{
+                    bounce = bounce/100;
+                }
+
+                gravidade = document.getElementById("gravidade").value;
+                if (gravidade<-10||gravidade>1000||gravidade==""){
+                    alert.innerHTML += "<div>Gravidade inválida. Limite: -10&le;x&le;1000</div>";
+                    gravidade = 0.05;
+                }
+                else{
+                    gravidade = (gravidade/100)*0.05;
+                }
+
+                velox = document.getElementById("velox").value;
+                if (velox<-100||velox>100||velox==""){
+                    alert.innerHTML += "<div>Velocidade inválida. Limite: -100&le;x&le;100 </div>";
+                    velox = 1;
+                }
+                else{
+                    velox = velox*0.1;
+                }
+
+                forca = document.getElementById("forca").value;
+                if (forca<1||forca>300||forca==""){
+                    alert.innerHTML += "<div>Força inválida. Limite: 1&le;x&le;300 </div>";
+                    forca = -3;
+                }
+                else{
+                    forca = -(forca/10);
+                }
+
+                type = document.getElementById("forma").value;
+
+                myGamePiece = new component(altura, cor, type, bounce, gravidade, velox);
+                pulos = 0;
+                document.getElementById("pulo").innerHTML = "Pulos: 0";
+                quique = 0;
+                document.getElementById("quique").innerHTML = "Quiques: 0";
+                change = 0;
+            }
+            else{
+                alert = document.getElementById("alert");
+                alert.innerHTML="<div>Despause para reiniciar.</div>";
+            }
+        }
+
+        function stopGame() {
+            document.body.focus();
+            if (stop==0) {
+                myGameArea.stop();
+                document.getElementById("stop").innerHTML="Despause"
+                stop = 1;
+                area = document.getElementById("canva");
+                area.style.opacity=0.8;
+                area.getContext("2d").font = "50px Arial";
+                area.getContext("2d").textAlign = "center";
+                area.getContext("2d").strokeStyle = "#000000";
+                area.getContext("2d").lineWidth = 4;
+                area.getContext("2d").strokeText("PAUSADO", area.width/2, area.height/2);
+                area.getContext("2d").fillStyle = document.getElementById("cor").value;
+                area.getContext("2d").fillText("PAUSADO", area.width/2, area.height/2);
+            }
+            else if (stop==1) {
+                myGameArea.restart();
+                document.getElementById("stop").innerHTML="Pause"
+                stop = 0;
+                alert.innerHTML="";
+                area.style.opacity=1;
+            }
+        }
+
+        function pular(){
+            document.body.focus();
+            if (stop==0) {
+                myGamePiece.gravitySpeed = forca;
+                pulos+=1;
+                document.getElementById("pulo").innerHTML = "Pulos: "+pulos;
+            }
+        }
+
+        function board(event){
+            cod = event.keyCode
+            document.getElementById("chave").innerHTML = "Key: "+cod
+        	key = event.keyCode;
+        	if (key==32){
+                pular();
+            }
+            else if (key==13){
+                startGame();
+            }
+            else if (key==80){
+                stopGame();
+            }
+        }
+
+        var myGameArea = {
+            canvas : document.createElement("canvas"),
+            start : function() {
+                this.canvas.id = "canva"
+                this.canvas.width = 700;
+                this.canvas.height = 400;
+                this.context = this.canvas.getContext("2d");
+                document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+                this.interval = setInterval(updateGameArea, 1);
+            },
+            stop : function() {
+                clearInterval(this.interval);
+            },    
+            clear : function() {
+                this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            },
+            restart : function() {
+                this.interval = setInterval(updateGameArea, 1); 
+            }
+        }
+
+        function component(height, color, type, bounce, gravidade, velox) {
+            this.height = height;
+            this.width = height;
+            this.x = 15;
+            this.y = 300;
+            this.speedX = velox; 
+            this.gravity = gravidade;
+            this.gravitySpeed = 0;
+            this.bounce = bounce;
+            this.update = function() {
+                ctx = myGameArea.context;
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                if (type==1) {
+                    ctx.rect(this.x, this.y, this.height, this.height);
+                }
+                else if (type==2) {
+                    this.height = height/2;
+                    ctx.arc(this.x, this.y, this.height, 0, 2 * Math.PI);
+                }
+                ctx.strokeStyle = "#000000";
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                ctx.fill();
+            }
+            this.newPos = function() {
+                this.gravitySpeed += this.gravity;
+                this.x += this.speedX;
+                this.y += this.gravitySpeed;
+                this.hitBottom();
+                this.hitSide();
+            }
+            this.hitBottom = function() {
+                var rockbottom = myGameArea.canvas.height - this.height;
+                if (this.y > rockbottom) {
+                    this.y = rockbottom;
+                    this.gravitySpeed = -(this.gravitySpeed * this.bounce);
+                    change=1;
+                }
+                else if (change==1 && ((this.y+0.4)<rockbottom)){
+                    change=0;
+                    quique+=1;
+                    document.getElementById("quique").innerHTML="Quiques: "+quique;
+                }
+            }
+            this.hitSide = function() {
+                if (this.speedX>0) {
+                    if (this.x > myGameArea.canvas.width) {
+                        this.x = -this.width; 
+                    }
+                }
+                else if (this.speedX<0){
+                    if (this.x < -this.width) {
+                        this.x = myGameArea.canvas.width; 
+                    }
+                }
+            }
+        }
+
+        function updateGameArea() {
+            myGameArea.clear();
+            myGamePiece.newPos();
+            myGamePiece.update();  
+        }
+    </script>
+
+    <div id="options">
+        <label>Altura:<br><input type="number" id="altura" min="1" max="500" placeholder="1 a 500"></label>
+        <br>
+        <label>Cor:<br><input type="color" id="cor"/></label>
+        <br>
+        <label>% do quique:<br><input type="number" id="bounce" min="0" max="1000" placeholder="0 a 1000"></label>
+        <br>
+        <label>% da Gravidade:<br><input type="number" id="gravidade" min="-10" max="1000" placeholder="-10 a 1000"></label>
+        <br>
+        <label>Velocidade:<br><input type="number" id="velox" min="-100" max="100" placeholder="-100 a 100"></label>
+        <br>
+        <label>Força do pulo:<br><input type="number" id="forca" min="1" max="300" placeholder="1 a 300"></label>
+        <br>
+        <label>Formato:<br>
+            <select id="forma">
+                <option value="1">Quadrado</option>
+                <option value="2">Círculo</option>
+            </select>
+        </label>
+        <div id="alert"></div>
+    </div>
+
+    <br>
+    <button id="start" onClick="startGame()">Start</button>
+    <button id="pular" onClick="pular()">Pular</button>
+    <button id="stop" onClick="stopGame()">Pause</button>
+    <p>Gravidade, pulos e quiques.</p>
+    <p id="pulo">Pulos: 0</p>
+    <p id="quique">Quiques: 0</p>
+    <p id="chave">Key: </p>
+</body>
+</html>
