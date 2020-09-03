@@ -15,9 +15,14 @@
 
         button{
         	width: 232px;
-            height: 40px;
-            font-size: 24px;
+            height: 46px;
+            font-size: 12px;
+            line-height: 12px;
             background-image: linear-gradient(to right, #ff0000, #ffa500, #ffff00, #008000, #0000ff, #4b0082, #ee82ee);
+        }
+        button b{
+            font-size: 24px;
+            line-height: 24px;
         }
         #options{
             position: absolute;
@@ -53,7 +58,7 @@
 
 <body onload="myGameArea.start(); insert();" onkeydown="board(event)" tabindex="0">
     <script>
-        var myGamePiece, i, rand = "0123456789ABCDEF", pulos = 0, stop = 0, altura, cor, type, bounce, gravidade, velox, alert, quique = 0, change=0, forca, area;
+        var myGamePiece, i, rand = "0123456789ABCDEF", pulos = 0, stop = 0, altura, cor, type, bounce, gravidade, velox, alert, quique = 0, change=0, forca, area, key;
 
         function insert(){
             document.getElementById("altura").value=30;
@@ -73,7 +78,7 @@
             if (stop!=1){
                 alert = document.getElementById("alert");
                 alert.innerHTML="";
-                document.getElementById("start").innerHTML="Restart"
+                document.getElementById("start").innerHTML="<b>Reiniciar</b><br>(Enter)"
 
                 altura = document.getElementById("altura").value;
                 if (altura<1||altura>500){
@@ -138,7 +143,7 @@
             document.body.focus();
             if (stop==0) {
                 myGameArea.stop();
-                document.getElementById("stop").innerHTML="Despause"
+                document.getElementById("stop").innerHTML="<b>Despausar</b><br>(P)"
                 stop = 1;
                 area = document.getElementById("canva");
                 area.style.opacity=0.8;
@@ -152,7 +157,7 @@
             }
             else if (stop==1) {
                 myGameArea.restart();
-                document.getElementById("stop").innerHTML="Pause"
+                document.getElementById("stop").innerHTML="<b>Pausar</b><br>(P)"
                 stop = 0;
                 alert.innerHTML="";
                 area.style.opacity=1;
@@ -169,8 +174,6 @@
         }
 
         function board(event){
-            cod = event.keyCode
-            document.getElementById("chave").innerHTML = "Key: "+cod
         	key = event.keyCode;
         	if (key==32){
                 pular();
@@ -293,12 +296,11 @@
     </div>
 
     <br>
-    <button id="start" onClick="startGame()">Start</button>
-    <button id="pular" onClick="pular()">Pular</button>
-    <button id="stop" onClick="stopGame()">Pause</button>
+    <button id="start" onClick="startGame()"><b>Iniciar</b><br>(Enter)</button>
+    <button id="pular" onClick="pular()"><b>Pular</b><br>(Barra de Espaço)</button>
+    <button id="stop" onClick="stopGame()"><b>Pausar</b><br>(P)</button>
     <p>Gravidade, pulos e quiques.</p>
     <p id="pulo">Pulos: 0</p>
     <p id="quique">Quiques: 0</p>
-    <p id="chave">Key: </p>
 </body>
 </html>
