@@ -93,8 +93,8 @@
                 }
 
                 gravidade = document.getElementById("gravidade").value;
-                if (gravidade<-10||gravidade>1000||gravidade==""){
-                    alert.innerHTML += "<div>Gravidade inválida. Limite: -10&le;x&le;1000</div>";
+                if (gravidade<-1000||gravidade>1000||gravidade==""){
+                    alert.innerHTML += "<div>Gravidade inválida. Limite: -1000&le;x&le;1000</div>";
                     gravidade = 0.05;
                 }
                 else{
@@ -111,8 +111,8 @@
                 }
 
                 forca = document.getElementById("forca").value;
-                if (forca<1||forca>300||forca==""){
-                    alert.innerHTML += "<div>Força inválida. Limite: 1&le;x&le;300 </div>";
+                if (forca<-300||forca>300||forca==""){
+                    alert.innerHTML += "<div>Força inválida. Limite: -300&le;x&le;300 </div>";
                     forca = -3;
                 }
                 else{
@@ -277,11 +277,11 @@
         <br>
         <label>% do quique:<br><input type="number" id="bounce" min="0" max="1000" placeholder="0 a 1000"></label>
         <br>
-        <label>% da Gravidade:<br><input type="number" id="gravidade" min="-10" max="1000" placeholder="-10 a 1000"></label>
+        <label>% da Gravidade:<br><input type="number" id="gravidade" min="-1000" max="1000" placeholder="-1000 a 1000"></label>
         <br>
         <label>Velocidade:<br><input type="number" id="velox" min="-100" max="100" placeholder="-100 a 100"></label>
         <br>
-        <label>Força do pulo:<br><input type="number" id="forca" min="1" max="300" placeholder="1 a 300"></label>
+        <label>Força do pulo:<br><input type="number" id="forca" min="-300" max="300" placeholder="-300 a 300"></label>
         <br>
         <label>Formato:<br>
             <select id="forma">
